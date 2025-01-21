@@ -16,6 +16,11 @@ import "react-toastify/dist/ReactToastify.css";
 import imgLogIn from "./img/login.jpg";
 import imgLogo from "./img/Logo.png";
 import imgEN from "./img/EN.png";
+import { useDispatch, useSelector } from "react-redux";
+import { GoogleLogin } from "@react-oauth/google";
+import { useGoogleLogin } from "@react-oauth/google";
+import FacebookLogin from "react-facebook-login";
+import ChatBox from "../ChatPage/ChatBox";
 
 const { Header, Content } = Layout;
 const { Title, Text } = Typography;
@@ -62,6 +67,8 @@ const LoginPage = () => {
           });
         }
       } else if (req1.status === 200) {
+        localStorage.setItem("accessToken", res1.accessToken);
+        localStorage.setItem("refreshToken", res1.refreshToken);
         toast.success(res1.message, {
           position: "top-center",
           autoClose: 1000,
@@ -95,6 +102,25 @@ const LoginPage = () => {
     console.log("Failed:", errorInfo);
   };
 
+  const loginByGG = useGoogleLogin({
+    onSuccess: (tokenResponse) => console.log(tokenResponse),
+  });
+
+  const loginByFB = () => {
+    FB.login(
+      function (response) {
+        if (response.authResponse) {
+          FB.api("/me", { fields: "name,email,picture" }, function (userInfo) {
+            console.log("Facebook User Info:", userInfo);
+          });
+        } else {
+          toast.warn("Facebook Login Cancelled", { position: "top-center" });
+        }
+      },
+      { scope: "public_profile,email" }
+    );
+  };
+
   return (
     <Layout style={{ height: "100vh" }}>
       <Header
@@ -105,7 +131,12 @@ const LoginPage = () => {
           justifyContent: "space-between",
         }}
       >
-        <img src={imgLogo} alt="" />
+        <img
+          src={imgLogo}
+          alt=""
+          className="cursor-pointer"
+          onClick={() => navigate("/")}
+        />
         <div className="flex items-center gap-3">
           <img
             src={imgEN}
@@ -139,10 +170,10 @@ const LoginPage = () => {
           style={{
             border: "1px solid #e6e6e6",
             borderRadius: "10px",
-            overflow: "hidden",
+            // overflow: "hidden",
             maxWidth: "750px",
             width: "100%",
-            // maxHeight: "700px",
+            maxHeight: "600px",
             boxShadow: "0 2px 8px rgba(0, 0, 0, 0.1)",
           }}
         >
@@ -167,6 +198,7 @@ const LoginPage = () => {
               flexDirection: "row",
               alignItems: "center",
               justifyContent: "center",
+              maxHeight: "600px",
             }}
           >
             <div className="w-full">
@@ -236,13 +268,17 @@ const LoginPage = () => {
                 </div>
                 <Row gutter={10} className="flex justify-center cursor-pointer">
                   <Col>
-                    <img src="/login/facebook.png" />
+                    <img src="/login/facebook.png" onClick={loginByFB} />
                   </Col>
                   <Col>
                     <img src="/login/apple.png" />
                   </Col>
                   <Col>
-                    <img src="/login/google.png" />
+                    <img
+                      src="/login/google.png"
+                      className="cursor-pointer"
+                      onClick={() => loginByGG()}
+                    />
                   </Col>
                 </Row>
                 <div style={{ textAlign: "center", marginTop: "20px" }}>
@@ -261,6 +297,7 @@ const LoginPage = () => {
           </Col>
         </Row>
       </Content>
+      <ChatBox />
       <ToastContainer />
     </Layout>
   );

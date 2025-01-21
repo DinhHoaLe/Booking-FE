@@ -16,6 +16,7 @@ import "react-toastify/dist/ReactToastify.css";
 import imgLogIn from "./img/login.jpg";
 import imgLogo from "./img/Logo.png";
 import imgEN from "./img/EN.png";
+import ChatBox from "../ChatPage/ChatBox";
 
 const { Header, Content } = Layout;
 const { Title, Text } = Typography;
@@ -24,17 +25,20 @@ const ForgotPasswordPage = () => {
   const navigate = useNavigate();
   const onFinish = async (values) => {
     try {
-      const req1 = await fetch(`${import.meta.env.VITE_URL_API}/login`, {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        credentials: "include",
-        body: JSON.stringify({
-          email: values.email,
-          password: values.password,
-        }),
-      });
+      const req1 = await fetch(
+        `${import.meta.env.VITE_URL_API}/forgot-password`,
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          credentials: "include",
+          body: JSON.stringify({
+            email: values.email,
+            password: values.password,
+          }),
+        }
+      );
       const res1 = await req1.json();
       if (req1.status === 400) {
         toast.warn(res1.message, {
@@ -58,7 +62,7 @@ const ForgotPasswordPage = () => {
           progress: undefined,
           theme: "light",
           onClose: () => {
-            navigate("/profile");
+            navigate("/reset-password");
           },
         });
       }
@@ -91,7 +95,12 @@ const ForgotPasswordPage = () => {
           justifyContent: "space-between",
         }}
       >
-        <img src={imgLogo} alt="" />
+        <img
+          src={imgLogo}
+          alt=""
+          className="cursor-pointer"
+          onClick={() => navigate("/")}
+        />
         <div className="flex items-center gap-3">
           <img
             src={imgEN}
@@ -124,10 +133,10 @@ const ForgotPasswordPage = () => {
           style={{
             border: "1px solid #e6e6e6",
             borderRadius: "10px",
-            overflow: "hidden",
-            maxWidth: "900px",
+            // overflow: "hidden",
+            maxWidth: "750px",
             width: "100%",
-            height: "720px",
+            maxHeight: "600px",
             boxShadow: "0 2px 8px rgba(0, 0, 0, 0.1)",
           }}
         >
@@ -142,7 +151,7 @@ const ForgotPasswordPage = () => {
             xs={24}
             md={12}
             style={{
-              padding: "40px",
+              padding: "20px",
               display: "flex",
               flexDirection: "row",
               alignItems: "center",
@@ -173,7 +182,12 @@ const ForgotPasswordPage = () => {
                 </Form.Item>
 
                 <Form.Item>
-                  <Button type="primary" htmlType="submit" block className="bg-[#07689f]">
+                  <Button
+                    type="primary"
+                    htmlType="submit"
+                    block
+                    className="bg-[#07689f]"
+                  >
                     Sent OTP
                   </Button>
                 </Form.Item>
@@ -231,6 +245,7 @@ const ForgotPasswordPage = () => {
         </Row>
       </Content>
       <ToastContainer />
+      <ChatBox />
     </Layout>
   );
 };
